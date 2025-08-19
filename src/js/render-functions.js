@@ -96,9 +96,7 @@ export function checkBtnVisibleStatus() {
   
   if (currentPage < maxPage) {
     showLoadMoreButton();
-  } else if (!inpValue) {
-    hideLoadMoreButton();
-  }
+  } 
   else{
     hideLoadMoreButton();
     iziToast.error({
