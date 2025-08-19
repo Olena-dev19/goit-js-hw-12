@@ -2,9 +2,17 @@
 import SimpleLightbox from "simplelightbox";
 // Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
+
+import { currentPage } from "../main.js";
+import { maxPage } from "../main.js";
+
 
 const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader-hidden');
+const loadBtn = document.querySelector('.js-load-btn');
+
 
 let galleryLight = null;
 
@@ -33,7 +41,7 @@ export function createGallery(images) {
         </ul>
       </li>`).join('');
     
-    gallery.insertAdjacentHTML('afterbegin', markup);
+    gallery.insertAdjacentHTML('beforeend', markup);
 
     if (!galleryLight) {
         galleryLight = new SimpleLightbox('.gallery a', {
@@ -63,6 +71,38 @@ export function hideLoader() {
 }
 
 
+ export function showLoadMoreButton() {
+  loadBtn.classList.remove('hidden');
+}
+
+ export function hideLoadMoreButton() {
+  loadBtn.classList.add('hidden');
+}
+
+export function smoothScrollAfterLoad() {
+  const firstCard = document.querySelector('.js-gallery .item-gallery'); 
+  if (!firstCard) return;
+
+  const cardHeight = firstCard.getBoundingClientRect().height;
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: "smooth"
+  });
+}
 
 
-
+export function checkBtnVisibleStatus() {
+  
+  if (currentPage < maxPage) {
+    showLoadMoreButton();
+  } else if (!inpValue) {
+    hideLoadMoreButton();
+  }
+  else{
+    hideLoadMoreButton();
+    iziToast.error({
+      message: "We're sorry, but you've reached the end of search results."
+      });
+  }
+}
