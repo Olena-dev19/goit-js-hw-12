@@ -6,8 +6,9 @@ import {createGallery} from './js/render-functions'
 import { clearGallery } from './js/render-functions';
 import {showLoader} from './js/render-functions'
 import {hideLoader} from './js/render-functions'
-import {checkBtnVisibleStatus} from './js/render-functions';
-import {smoothScrollAfterLoad} from './js/render-functions';
+import { smoothScrollAfterLoad } from './js/render-functions';
+import { hideLoadMoreButton } from './js/render-functions';
+import { showLoadMoreButton } from './js/render-functions';
 
 
 //======================================
@@ -28,25 +29,43 @@ formEl.addEventListener("submit", async (e) => {
 
     inpValue = inputValue.value.trim();
     currentPage = 1;
+
+    if (!inpValue) {
+        iziToast.error({
+            message: 'Sorry, there are no images matching your search query. Please try again!'
+            });
+        return;
+       }
+
     showLoader();
+    hideLoadMoreButton();
     try {
-       
+        
+        
         const res = await getImagesByQuery(inpValue, currentPage);
         const arrOfImage = res.hits;
-        
-        if (arrOfImage.length === 0 || !inpValue) {
+
+        if (arrOfImage.length === 0) {
             iziToast.error({
                 message: 'Sorry, there are no images matching your search query. Please try again!'
             });
             clearGallery();
-            
-            return;
+           return;
         }
+       
+        
         clearGallery();
         createGallery(arrOfImage);
 
         maxPage = Math.ceil(res.totalHits / pageSize);
-       
+        if (currentPage < maxPage) {
+            showLoadMoreButton();
+        } else {
+            hideLoadMoreButton();
+            iziToast.error({
+                message: "We're sorry, but you've reached the end of search results."
+            });
+        }
     }
 
     catch {
@@ -58,17 +77,16 @@ formEl.addEventListener("submit", async (e) => {
     }
     finally {
         hideLoader();
-    }
-
-    checkBtnVisibleStatus();
+    }  
     formEl.reset();
 });
 
 loadBtn.addEventListener('click', async () => {
     currentPage += 1;
-
-    checkBtnVisibleStatus();
-    try {
+    hideLoadMoreButton();
+    showLoader();
+    
+    try{
         const res = await getImagesByQuery(inpValue, currentPage);
         createGallery(res.hits);
         smoothScrollAfterLoad();
@@ -76,6 +94,16 @@ loadBtn.addEventListener('click', async () => {
         iziToast.error({
             message: 'Sorry, there are no images matching your search query. Please try again!'
         });
+    } finally {
+        hideLoader();
+        if (currentPage < maxPage) {
+            showLoadMoreButton();
+        } else {
+            hideLoadMoreButton();
+            iziToast.error({
+                message: "We're sorry, but you've reached the end of search results."
+            });
+        }
     }
 })
 

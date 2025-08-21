@@ -71,11 +71,13 @@ export function hideLoader() {
 }
 
 
- export function showLoadMoreButton() {
+export function showLoadMoreButton() {
+  loadBtn.disabled = false;
   loadBtn.classList.remove('hidden');
 }
 
- export function hideLoadMoreButton() {
+export function hideLoadMoreButton() {
+  loadBtn.disabled = true;
   loadBtn.classList.add('hidden');
 }
 
@@ -92,15 +94,3 @@ export function smoothScrollAfterLoad() {
 }
 
 
-export function checkBtnVisibleStatus() {
-  
-  if (currentPage < maxPage) {
-    showLoadMoreButton();
-  } 
-  else{
-    hideLoadMoreButton();
-    iziToast.error({
-      message: "We're sorry, but you've reached the end of search results."
-      });
-  }
-}
