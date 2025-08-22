@@ -81,16 +81,5 @@ export function hideLoadMoreButton() {
   loadBtn.classList.add('hidden');
 }
 
-export function smoothScrollAfterLoad() {
-  const firstCard = document.querySelector('.js-gallery .item-gallery'); 
-  if (!firstCard) return;
-
-  const cardHeight = firstCard.getBoundingClientRect().height;
-
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: "smooth"
-  });
-}
 
 

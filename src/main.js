@@ -6,7 +6,6 @@ import {createGallery} from './js/render-functions'
 import { clearGallery } from './js/render-functions';
 import {showLoader} from './js/render-functions'
 import {hideLoader} from './js/render-functions'
-import { smoothScrollAfterLoad } from './js/render-functions';
 import { hideLoadMoreButton } from './js/render-functions';
 import { showLoadMoreButton } from './js/render-functions';
 
@@ -35,13 +34,14 @@ formEl.addEventListener("submit", async (e) => {
             message: 'Sorry, there are no images matching your search query. Please try again!'
             });
         return;
-       }
+    }
+    
+    clearGallery();
 
     showLoader();
     hideLoadMoreButton();
+
     try {
-        
-        
         const res = await getImagesByQuery(inpValue, currentPage);
         const arrOfImage = res.hits;
 
@@ -49,12 +49,9 @@ formEl.addEventListener("submit", async (e) => {
             iziToast.error({
                 message: 'Sorry, there are no images matching your search query. Please try again!'
             });
-            clearGallery();
            return;
         }
        
-        
-        clearGallery();
         createGallery(arrOfImage);
 
         maxPage = Math.ceil(res.totalHits / pageSize);
@@ -88,8 +85,24 @@ loadBtn.addEventListener('click', async () => {
     
     try{
         const res = await getImagesByQuery(inpValue, currentPage);
+        if (!res.hits.length) {
+            iziToast.info({
+                message: "Sorry, there are no images matching your search query. Please try again!"
+            });
+            return;
+        }
+
         createGallery(res.hits);
-        smoothScrollAfterLoad();
+
+
+        const firstCard = document.querySelector('.js-gallery .item-gallery');
+        if (!firstCard) return;
+        const cardHeight = firstCard.getBoundingClientRect().height;
+        window.scrollBy({
+            top: cardHeight * 2,
+            behavior: "smooth"
+        });
+
     } catch {
         iziToast.error({
             message: 'Sorry, there are no images matching your search query. Please try again!'
